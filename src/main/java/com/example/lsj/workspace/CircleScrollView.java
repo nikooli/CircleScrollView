@@ -4,45 +4,47 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 /**
- * Created by lsj on 2015/12/19.
+ * Created by lsj on 2015/12/21.
  */
-public class CircleScrollView extends ViewGroup {
-    private Paint mCirPaint;
+public class CircleScrollView extends ScrollView {
+
     private float mTextWidth = 0.0f;
-    private CircleView circleView;
+    private float mTextHeight = 0.0f;
+    private Context context;
     /**
-     * RectF存储四个float类型的坐标值，分别为左、上、右、下
-     * 通过这四个值可以呈现一个矩形。
-     * 这里面的值可以直接存取，并且可以通过width()和height()函数
-     * 很方便的获得矩形的宽和高。注意，这里并没有判断值的合法性。
-     * 比如左比右大了。正确的为左<=右，上<=下
+     * item的高度
      */
-    private RectF mCircleBounds = new RectF();
+    int itemHeight = 0;
+    int viewWidth;
+    private int initialY;
+    private long newCheck = 50;
+    Runnable scrollerTask;
+    private LinearLayout root_view;
+    private LayoutInflater layoutInflater;
+    private Paint trianglePaint;
+    private RectF mTriangleBounds;
 
     public CircleScrollView(Context context) {
         super(context);
-        init();
     }
 
-    /**
-     * 如果要在xml布局中使用该控件，必须重载带attr的构造函数
-     *
-     * @param context
-     * @param attrs
-     */
     public CircleScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
-                R.styleable.CircleScrollView,
+                R.styleable.CircleScrollView1,
                 0, 0
         );
 
@@ -53,88 +55,80 @@ public class CircleScrollView extends ViewGroup {
             // The R.styleable.PieChart_* constants represent the index for
             // each custom attribute in the R.styleable.PieChart array.
 
-            mTextWidth = a.getDimension(R.styleable.CircleScrollView_labelWidth, 0.0f);
-
+            mTextWidth = a.getDimension(R.styleable.CircleScrollView1_labelWidth, 0.0f);
+            mTextHeight = a.getDimension(R.styleable.CircleScrollView1_labelHeight, 0.0f);
         } finally {
             // release the TypedArray so that it can be reused.
             a.recycle();
         }
-        init();
+        init(context);
     }
 
     public CircleScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
-    private void init() {
-        mCirPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mCirPaint.setColor(Color.parseColor("#232323"));
+    private void init(Context context) {
+        this.context = context;
+        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.setVerticalScrollBarEnabled(false);
 
-        circleView = new CircleView(getContext());
-        addView(circleView);
+        trianglePaint = new Paint();
+        trianglePaint.setColor(Color.RED);// 设置红色
+        trianglePaint.setStyle(Paint.Style.FILL);//设置填满
+
+        root_view = new LinearLayout(context);
+        root_view.setOrientation(LinearLayout.VERTICAL);
+        this.addView(root_view);
+        for (int i = 0; i < 7; i++) {
+            root_view.addView(createView());
+        }
     }
 
-    @Override
-    protected int getSuggestedMinimumWidth() {
-        return (int) mTextWidth;
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int count = getChildCount();
-        //计算该ViewGroup的宽度
-        int minw = getPaddingLeft() + getPaddingRight() + getSuggestedMinimumWidth();
-        int w = Math.min(minw, MeasureSpec.getSize(widthMeasureSpec));
-        //计算该ViewGroup的高度
-        int minh = (w - (int) mTextWidth) + getPaddingBottom() + getPaddingTop();
-        int h = Math.max(MeasureSpec.getSize(heightMeasureSpec), minh);
-
-        setMeasuredDimension(w, h);
-    }
-
-    /**
-     * 在这个函数中计算子View的尺寸大小，然后放置子View
-     * 也可以在onLayout函数中放置子View
-     * @param w
-     * @param h
-     * @param oldw
-     * @param oldh
-     */
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        float xpad = (float) (getPaddingLeft() + getPaddingRight());
-        float ypad = (float) (getPaddingTop() + getPaddingBottom());
-
-// Figure out how big we can make the pie.
-//        float diameter = Math.min(ww, hh);
-        mCircleBounds = new RectF(
-                0.0f,
-                0.0f,
-                100.0f,
-                100.0f);
-        circleView.layout((int) mCircleBounds.left,
-                (int) mCircleBounds.top,
-                (int) mCircleBounds.right,
-                (int) mCircleBounds.bottom);
+    private View createView() {
+        MyCircleTextView circleTextView = new MyCircleTextView(context);
+        circleTextView.setmLabelText("dddddd");
+        circleTextView.setmLabelColor(Color.parseColor("#00dfc1"));
+        circleTextView.setmLabelTextSize(20.0f);
+        circleTextView.setmLabelTextColor(context.getResources().getColor(R.color.black));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(200, 200);
+        circleTextView.setLayoutParams(params);
+        return circleTextView;
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+    }
+
+    @Override
+    public void setBackground(Drawable background) {
+        super.setBackground(background);
+        if(mTriangleBounds != null) {
+            Canvas canvas = new Canvas();
+            Path path = new Path();
+            path.moveTo(mTriangleBounds.left, mTriangleBounds.top);// 此点为多边形的起点
+            path.lineTo(mTriangleBounds.right, mTriangleBounds.bottom - (mTriangleBounds.bottom - mTriangleBounds.top) / 2);
+            path.lineTo(mTriangleBounds.left, mTriangleBounds.bottom);
+            path.close(); // 使这些点构成封闭的多边形
+            canvas.drawPath(path, trianglePaint);
+            background.draw(canvas);
+        }
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
 
     }
 
-    private class CircleView extends View {
-
-        public CircleView(Context context) {
-            super(context);
-        }
-
-        @Override
-        protected void onDraw(Canvas canvas) {
-            super.onDraw(canvas);
-            canvas.drawCircle(100, 100, 100, mCirPaint);
-        }
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mTriangleBounds = new RectF(
+                0.0f, 0.0f, 20.0f, 20.0f
+        );
+        viewWidth = w;
+//        setBackground(null);
     }
 }

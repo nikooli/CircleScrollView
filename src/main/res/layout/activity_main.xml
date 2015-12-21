@@ -10,9 +10,18 @@
     tools:context="com.example.lsj.workspace.MainActivity">
 
     <com.example.lsj.workspace.CircleScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:background="#ff8eff48"
         android:padding="10dp"
-        custom:labelWidth="110dp"/>
+        custom:labelWidth="110dp"
+        custom:labelHeight="500dp"/>
+
+    <!--<com.example.lsj.workspace.MyCircleTextView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        custom:labelTextColor="#000000"
+        custom:labelColor="@color/white"
+        custom:labelTextSize="20sp"
+        custom:labelText="你好"/>-->
 </RelativeLayout>

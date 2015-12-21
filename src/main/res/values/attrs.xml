@@ -14,9 +14,17 @@
 -->
 
 <resources>
-    <declare-styleable name="CircleScrollView">
+    <declare-styleable name="CircleScrollView1">
 
         <attr name="labelWidth" format="dimension"/>
+        <attr name="labelHeight" format="dimension"/>
+        <attr name="circleMargin" format="dimension"/>
 
+    </declare-styleable>
+    <declare-styleable name="CircleView">
+        <attr name="labelText" format="string"/>
+        <attr name="labelColor" format="color"/>
+        <attr name="labelTextSize" format="dimension"/>
+        <attr name="labelTextColor" format="color"/>
     </declare-styleable>
 </resources>
