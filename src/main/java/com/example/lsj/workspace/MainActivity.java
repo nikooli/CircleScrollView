@@ -1,20 +1,67 @@
 package com.example.lsj.workspace;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ScrollView;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 
 public class MainActivity extends Activity {
+
+    private static final int DURATION = 1500;
+    private static final float BALL_SIZE = 100f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ScrollView scrollView = new ScrollView(this);
+        LinearLayout layout = (LinearLayout) findViewById(R.id.root_view);
+        BallView ballView = new BallView(this);
+//        ballView.init(50, 0);
+        layout.addView(ballView);
+    }
+
+    private void ddd() {
+        //        CircleScrollView scrollView = (CircleScrollView) findViewById(R.id.circlescrollview);
+//        scrollView.setItems();
+//        MyCircleTextView circleTextView = (MyCircleTextView) findViewById(R.id.circleview);
+        MyCircleTextView circleTextView = new MyCircleTextView(this);
+        circleTextView.setmLabelRadius(100);
+        circleTextView.setmLabelTextColor(R.color.black);
+        circleTextView.setmLabelColor(R.color.white);
+        circleTextView.setmLabelText("ÄãºÃ");
+//        layout.addView(circleTextView);
+        PropertyValuesHolder pvhW = PropertyValuesHolder.ofFloat("scaleX", circleTextView.getmLabelRadius() * 2,
+                circleTextView.getmLabelRadius() * 4);
+        PropertyValuesHolder pvhH = PropertyValuesHolder.ofFloat("scaleY", circleTextView.getmLabelRadius() * 2,
+                circleTextView.getmLabelRadius() * 4);
+        /*PropertyValuesHolder pvTX = PropertyValuesHolder.ofFloat("x", circleTextView.getCenterX(),
+                circleTextView.getCenterX() - BALL_SIZE / 2f);
+        PropertyValuesHolder pvTY = PropertyValuesHolder.ofFloat("y", circleTextView.getCenterY(),
+                circleTextView.getCenterY() - BALL_SIZE / 2f);*/
+        ObjectAnimator whxyBouncer = ObjectAnimator.ofPropertyValuesHolder(circleTextView, pvhW, pvhH
+        ).setDuration(DURATION / 2);
+        final Animator bounceAnim = new AnimatorSet();
+        whxyBouncer.setRepeatCount(1);
+        whxyBouncer.setRepeatMode(ValueAnimator.REVERSE);
+        ((AnimatorSet) bounceAnim).play(whxyBouncer);
+        Button button = (Button) findViewById(R.id.button_play);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bounceAnim.start();
+            }
+        });
+//        ((AnimatorSet) bounceAnim).playTogether(yBouncer, yAlphaBouncer, whxyBouncer,
+//                yxBouncer);
     }
 
     @Override

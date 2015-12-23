@@ -19,6 +19,7 @@
         <attr name="labelWidth" format="dimension"/>
         <attr name="labelHeight" format="dimension"/>
         <attr name="circleMargin" format="dimension"/>
+        <attr name="labelOffset" format="integer"/>
 
     </declare-styleable>
     <declare-styleable name="CircleView">
@@ -26,5 +27,6 @@
         <attr name="labelColor" format="color"/>
         <attr name="labelTextSize" format="dimension"/>
         <attr name="labelTextColor" format="color"/>
+        <attr name="labelRadius" format="dimension"/>
     </declare-styleable>
 </resources>
