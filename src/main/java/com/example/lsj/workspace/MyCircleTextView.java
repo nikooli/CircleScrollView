@@ -174,7 +174,6 @@ public class MyCircleTextView extends View implements ValueAnimator.AnimatorUpda
         float y = radius + (fontMetrics.ascent + fontMetrics.descent);
         StaticLayout staticLayout = new StaticLayout(
                 mLabelText, mTextPaint, (int) mLabelRadius * 2, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, true);
-//        canvas.drawText(text, x, y, mTextPaint);
 
         canvas.translate(0, y);
         staticLayout.draw(canvas);

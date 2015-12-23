@@ -24,9 +24,16 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LinearLayout layout = (LinearLayout) findViewById(R.id.root_view);
-        BallView ballView = new BallView(this);
+        final BallView ballView = new BallView(this);
 //        ballView.init(50, 0);
         layout.addView(ballView);
+        Button button = (Button) findViewById(R.id.button_play);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ballView.startAnimation();
+            }
+        });
     }
 
     private void ddd() {
@@ -53,13 +60,7 @@ public class MainActivity extends Activity {
         whxyBouncer.setRepeatCount(1);
         whxyBouncer.setRepeatMode(ValueAnimator.REVERSE);
         ((AnimatorSet) bounceAnim).play(whxyBouncer);
-        Button button = (Button) findViewById(R.id.button_play);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bounceAnim.start();
-            }
-        });
+
 //        ((AnimatorSet) bounceAnim).playTogether(yBouncer, yAlphaBouncer, whxyBouncer,
 //                yxBouncer);
     }
